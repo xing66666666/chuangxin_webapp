@@ -41,6 +41,12 @@ public class MainActivity extends AppCompatActivity {
         settings.setDatabaseEnabled(true);
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
+        
+        // ========= 修改点 1：解决字体小和右侧留白 =========
+        // 将网页字体和整体缩放放大到 160% (如果觉得还不够大，可以把160改成180或200)
+        settings.setTextZoom(160); 
+        // =================================================
+
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
@@ -60,6 +66,11 @@ public class MainActivity extends AppCompatActivity {
         webView.setVerticalScrollBarEnabled(false);
         webView.setHorizontalScrollBarEnabled(false);
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+
+        // ========= 修改点 2：解决网页背景和黑边 =========
+        // 强制把 WebView 背景设为白色，防止显示黑底
+        webView.setBackgroundColor(0xFFFFFFFF); 
+        // ===============================================
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -107,4 +118,4 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-}
+            }
