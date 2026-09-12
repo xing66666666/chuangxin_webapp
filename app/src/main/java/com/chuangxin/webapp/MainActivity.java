@@ -42,10 +42,10 @@ public class MainActivity extends AppCompatActivity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         
-        // ========= 修改点 1：解决字体小和右侧留白 =========
-        // 将网页字体和整体缩放放大到 160% (如果觉得还不够大，可以把160改成180或200)
-        settings.setTextZoom(160); 
-        // =================================================
+        // ========= 修改点：字体大小 =========
+        // 150 表示放大 1.5 倍。如果觉得字小，把 150 改成 180 或 200 (数字越大字越大)
+        settings.setTextZoom(150); 
+        // ===================================
 
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
@@ -67,17 +67,38 @@ public class MainActivity extends AppCompatActivity {
         webView.setHorizontalScrollBarEnabled(false);
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
-        // ========= 修改点 2：解决网页背景和黑边 =========
-        // 强制把 WebView 背景设为白色，防止显示黑底
-        webView.setBackgroundColor(0xFFFFFFFF); 
-        // ===============================================
-
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 view.loadUrl(request.getUrl().toString());
                 return true;
             }
+
+            // ========= 核心修改点：强制网页铺满屏幕，消除右侧白边 =========
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                
+                // 注入 JavaScript 命令：强制修改网页的宽度限制
+                view.loadUrl("javascript:(function() { " +
+                        // 强制修改视口设置，让它等于设备宽度
+                        "var meta = document.querySelector('meta[name=viewport]'); " +
+                        "if(meta) { " +
+                        "   meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); " +
+                        "} else { " +
+                        "   var newMeta = document.createElement('meta'); " +
+                        "   newMeta.name = 'viewport'; " +
+                        "   newMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'; " +
+                        "   document.head.appendChild(newMeta); " +
+                        "} " +
+                        // 强制网页主体宽度变成 100%，去除边距
+                        "document.body.style.width = '100vw'; " +
+                        "document.body.style.margin = '0'; " +
+                        "document.body.style.padding = '0'; " +
+                        "document.documentElement.style.width = '100vw'; " +
+                        "})()");
+            }
+            // ============================================================
         });
 
         webView.loadUrl(TARGET_URL);
@@ -118,4 +139,4 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-            }
+                             }
