@@ -42,10 +42,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
         
-        // ========= 修改点：字体大小 =========
-        // 150 表示放大 1.5 倍。如果觉得字小，把 150 改成 180 或 200 (数字越大字越大)
-        settings.setTextZoom(150); 
-        // ===================================
+        // 注意：这里已经删除了 setTextZoom，不再单独放大字体了
 
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
@@ -74,31 +71,30 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            // ========= 核心修改点：强制网页铺满屏幕，消除右侧白边 =========
+            // ========= 核心修改点：整体等比放大 =========
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 
-                // 注入 JavaScript 命令：强制修改网页的宽度限制
+                // 注入 JavaScript，告诉网页屏幕宽度是 1000 像素
+                // 这样平板（约 1200 像素）就会自动把网页整体放大 1.2 倍，填满屏幕，且不会左右滑动
                 view.loadUrl("javascript:(function() { " +
-                        // 强制修改视口设置，让它等于设备宽度
                         "var meta = document.querySelector('meta[name=viewport]'); " +
                         "if(meta) { " +
-                        "   meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); " +
+                        "   meta.setAttribute('content', 'width=1000, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); " +
                         "} else { " +
                         "   var newMeta = document.createElement('meta'); " +
                         "   newMeta.name = 'viewport'; " +
-                        "   newMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'; " +
+                        "   newMeta.content = 'width=1000, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'; " +
                         "   document.head.appendChild(newMeta); " +
                         "} " +
-                        // 强制网页主体宽度变成 100%，去除边距
-                        "document.body.style.width = '100vw'; " +
                         "document.body.style.margin = '0'; " +
                         "document.body.style.padding = '0'; " +
-                        "document.documentElement.style.width = '100vw'; " +
+                        "document.documentElement.style.margin = '0'; " +
+                        "document.documentElement.style.padding = '0'; " +
                         "})()");
             }
-            // ============================================================
+            // ============================================
         });
 
         webView.loadUrl(TARGET_URL);
@@ -139,4 +135,4 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-                             }
+}
