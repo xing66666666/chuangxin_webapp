@@ -29,11 +29,11 @@ jobs:
 
       - name: Download Gradle Manually
         run: |
-          wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
-          unzip -q gradle-8.5-bin.zip
+          wget https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          unzip -q gradle-8.2-bin.zip
 
       - name: Build Debug APK
-        run: ./gradle-8.5/bin/gradle assembleDebug
+        run: ./gradle-8.2/bin/gradle assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
