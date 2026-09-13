@@ -3,6 +3,7 @@ package com.chuangxin.webapp;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
@@ -39,13 +40,16 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
-
-        // 标准自适应设置
-        settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
+        settings.setUseWideViewPort(true);
+
+        // 隐藏放大镜和滚动条
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
+        webView.setVerticalScrollBarEnabled(false);
+        webView.setHorizontalScrollBarEnabled(false);
+        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
@@ -60,10 +64,17 @@ public class MainActivity extends AppCompatActivity {
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 
-        // 隐藏滚动条，但保留上下滚动的能力
-        webView.setVerticalScrollBarEnabled(false); 
-        webView.setHorizontalScrollBarEnabled(false); 
-        webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        // ========= 核心黑科技：根据平板屏幕宽度，算出完美的缩放比例 =========
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int screenWidth = displayMetrics.widthPixels; // 获取平板真实宽度（比如 1200 像素）
+        
+        // 假设网页设计师当初设定的宽度是 1024 像素（这是绝大多数老网站的默认宽度）
+        // 那么 scale = 1200 / 1024 * 100 = 117
+        // App 会自动把网页放大 1.17 倍，宽度刚好铺满，高度也跟着等比放大！
+        int scale = (int) ((float) screenWidth / 1024 * 100);
+        webView.setInitialScale(scale); 
+        // ==================================================================
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -111,4 +122,4 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-}
+    }
