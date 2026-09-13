@@ -39,15 +39,14 @@ public class MainActivity extends AppCompatActivity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
-        settings.setLoadWithOverviewMode(true);
+
+        // 标准自适应设置
         settings.setUseWideViewPort(true);
-
-        // 核心代码：伪装成电脑版浏览器，解决留白问题
-        settings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
-
+        settings.setLoadWithOverviewMode(true);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
+
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
@@ -61,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 
-        webView.setVerticalScrollBarEnabled(false);
-        webView.setHorizontalScrollBarEnabled(false);
+        // 隐藏滚动条，但保留上下滚动的能力
+        webView.setVerticalScrollBarEnabled(false); 
+        webView.setHorizontalScrollBarEnabled(false); 
         webView.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         webView.setWebViewClient(new WebViewClient() {
@@ -70,25 +70,6 @@ public class MainActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 view.loadUrl(request.getUrl().toString());
                 return true;
-            }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-
-                // 让电脑版网页自动计算比例，完美缩放并铺满屏幕
-                view.loadUrl("javascript:(function() { " +
-                        "var screenWidth = window.innerWidth; " +
-                        "var bodyWidth = document.body.scrollWidth; " +
-                        "if (bodyWidth > 0 && screenWidth > 0) { " +
-                        "   var scale = screenWidth / bodyWidth; " +
-                        "   document.body.style.zoom = scale; " +
-                        "} " +
-                        "document.documentElement.style.overflowX = 'hidden'; " +
-                        "document.body.style.overflowX = 'hidden'; " +
-                        "document.documentElement.style.overflowY = 'hidden'; " +
-                        "document.body.style.overflowY = 'hidden'; " +
-                        "})()");
             }
         });
 
@@ -130,4 +111,4 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-    }
+}
