@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
 
+        // 核心代码：伪装成电脑版浏览器，解决留白问题
+        settings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
+
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
@@ -69,28 +72,24 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            // ========= 核心修改：自适应平板比例 =========
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
 
-                // 注入 JS 代码：计算屏幕宽度和网页宽度的比例，然后整体等比例缩放
+                // 让电脑版网页自动计算比例，完美缩放并铺满屏幕
                 view.loadUrl("javascript:(function() { " +
-                        "var screenWidth = window.innerWidth; " +          // 获取平板屏幕宽度
-                        "var bodyWidth = document.body.scrollWidth; " +    // 获取网页实际宽度
+                        "var screenWidth = window.innerWidth; " +
+                        "var bodyWidth = document.body.scrollWidth; " +
                         "if (bodyWidth > 0 && screenWidth > 0) { " +
-                        "   var scale = screenWidth / bodyWidth; " +       // 计算缩放比例
-                        // 限制一下缩放比例，防止网页计算出极端值（比如极小或极大）
-                        "   if (scale > 0.5 && scale < 3.0) { " +
-                        "       document.body.style.zoom = scale; " +     // 整体缩放网页（图、文、布局一起放大）
-                        "   } " +
+                        "   var scale = screenWidth / bodyWidth; " +
+                        "   document.body.style.zoom = scale; " +
                         "} " +
-                        // 锁死横向滚动，防止因浮点数计算误差产生微小滑动
                         "document.documentElement.style.overflowX = 'hidden'; " +
                         "document.body.style.overflowX = 'hidden'; " +
+                        "document.documentElement.style.overflowY = 'hidden'; " +
+                        "document.body.style.overflowY = 'hidden'; " +
                         "})()");
             }
-            // ============================================
         });
 
         webView.loadUrl(TARGET_URL);
